@@ -1,0 +1,1 @@
+db.murals.update({ _id: "1" }, { _id: "1", "widgets": { "10001": { "x" : 20, "y" : 50, "color": "#FFF784", "width": 280, "height": 160, }, "10002": { "x" : 120, "y" : 80, "color": "#AE59F3", "width": 280, "height": 160, }, "10003": { "x" : 520, "y" : 120, "color": "#9CED5C", "width": 280, "height": 160, } } }, true)
