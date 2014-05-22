@@ -36,6 +36,25 @@
 			$elem.css('left', x).css('top', y);
 		});
 
+		Hammer(elem).on("dragend", function(e) {
+			var y = parseInt($elem.css('top').replace(/px$/, ''), 10);
+			var x = parseInt($elem.css('left').replace(/px$/, ''), 10);
+
+			$.post('/murals/1', {
+				action: 'update',
+				property: 'x',
+				value: x,
+				widget: $elem.data('id')
+			});
+
+			$.post('/murals/1', {
+				action: 'update',
+				property: 'y',
+				value: y,
+				widget: $elem.data('id')
+			});
+		});
+
 		return $elem;
 	}
 })( jQuery );
