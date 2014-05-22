@@ -1,4 +1,5 @@
-var express = require('express');
+var express = require('express'),
+    MongoClient = require('mongodb').MongoClient;
 
 // Create the Express application
 var app = module.exports = express();
@@ -20,6 +21,24 @@ app.configure(function() {
 app.get("/", function(req, res, next) {
   res.render("index");
 });
+
+app.get("/murals/:id", function(req, res, next) {
+  withDb(function(db) {
+    db.collection('murals').findOne({ _id: req.params.id }, function(err, one) {
+      if(err) return next(err);
+
+      res.send(one);
+    });
+  });
+});
+
+function withDb(done) {
+  MongoClient.connect('mongodb://127.0.0.1:27017/html5devconf2014', function(err, db) {
+    if(err) throw err;
+
+    return done(db);
+  });
+}
 
 app.listen(process.env.PORT || 4001, function() {
     console.log("Server running in %s mode", app.settings.env);
