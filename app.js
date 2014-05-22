@@ -1,6 +1,10 @@
 var express = require('express'),
     MongoClient = require('mongodb').MongoClient;
 
+var env = process.env;
+var Pusher = require('pusher');
+var pusher = new Pusher({ appId: env.PUSHER_APP_ID, key: env.PUSHER_APP_KEY, secret: env.PUSHER_APP_SECRET });
+
 // Create the Express application
 var app = module.exports = express();
 
@@ -19,7 +23,7 @@ app.configure(function() {
 });
 
 app.get("/", function(req, res, next) {
-  res.render("index");
+  res.render("index", { pusherKey: process.env.PUSHER_APP_KEY });
 });
 
 app.get("/murals/:id", function(req, res, next) {
@@ -40,7 +44,9 @@ app.post("/murals/:id", function(req, res, next) {
     db.collection('murals').update({ _id: id }, values, function(err) {
       if (err) return next(err);
 
-      res.send(200);
+      pusher.trigger('html5devconf2014', 'operation', req.body, req.body.socketId, function() {
+        res.send(200);
+      });
     });
   });
 });

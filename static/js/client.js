@@ -1,4 +1,6 @@
 (function($) {
+	var pusher = new Pusher($("#pusherKey").val());
+
 	$(document).ready(function() {
 		$.get('/murals/1', function(data) {
 			var $board = $("#board");
@@ -7,6 +9,14 @@
 				return _.extend({ id: k }, data.widgets[k]);
 			}).forEach(function(w) {
 				$board.append(handleWidgetEvents($(widgetTemplate(w))));
+			});
+
+			var channel = pusher.subscribe('html5devconf2014');
+			channel.bind('operation', function(operation) {
+				// HACK: this is just because we're always sending
+				// either x or y.
+				var key = operation.property == "x" ? "left" : "top";
+				$(".widget[data-id='" + operation.widget + "']").css(key, operation.value + 'px');
 			});
 		});
 	});
@@ -44,14 +54,16 @@
 				action: 'update',
 				property: 'x',
 				value: x,
-				widget: $elem.data('id')
+				widget: $elem.data('id'),
+				socketId: pusher.connection.socket_id
 			});
 
 			$.post('/murals/1', {
 				action: 'update',
 				property: 'y',
 				value: y,
-				widget: $elem.data('id')
+				widget: $elem.data('id'),
+				socketId: pusher.connection.socket_id
 			});
 		});
 
