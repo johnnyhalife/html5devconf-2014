@@ -38,7 +38,7 @@ app.get("/murals/:id", function(req, res, next) {
 
 app.post("/murals/:id", function(req, res, next) {
   var id = req.params.id;
-  var values = generateValues(req.body);
+  var values = generateValues(req.body.operations);
 
   withDb(function(db){
     db.collection('murals').update({ _id: id }, values, function(err) {
@@ -51,16 +51,18 @@ app.post("/murals/:id", function(req, res, next) {
   });
 });
 
-function generateValues(operation) {
-  switch (operation.action) {
-    case 'update':
-      var key = 'widgets.' + operation.widget + '.' + operation.property;
+function generateValues(operations) {
+  var values = { $set: {} };
 
-      var values = { $set: {} }
-      values['$set'][key] = operation.value;
+  operations.forEach(function(operation) {
+      switch (operation.action) {
+        case 'update':
+          var key = 'widgets.' + operation.widget + '.' + operation.property;
+          values.$set[key] = operation.value;
+      };
+  });
 
-      return values;
-  };
+  return values;
 };
 
 function withDb(done) {
