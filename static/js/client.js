@@ -50,21 +50,21 @@
 			var y = parseInt($elem.css('top').replace(/px$/, ''), 10);
 			var x = parseInt($elem.css('left').replace(/px$/, ''), 10);
 
-			$.post('/murals/1', {
+			$.ajaxq ("opqueue", { method: 'post', url: '/murals/1', contentType: "application/json; charset=utf-8", dataType: "json", data: JSON.stringify({
 				action: 'update',
 				property: 'x',
 				value: x,
 				widget: $elem.data('id'),
 				socketId: pusher.connection.socket_id
-			});
+			})});
 
-			$.post('/murals/1', {
+			$.ajaxq ("opqueue", { method: 'post', url: '/murals/1', contentType: "application/json; charset=utf-8", dataType: "json", data: JSON.stringify({
 				action: 'update',
 				property: 'y',
 				value: y,
 				widget: $elem.data('id'),
 				socketId: pusher.connection.socket_id
-			});
+			})});
 		});
 
 		return $elem;
