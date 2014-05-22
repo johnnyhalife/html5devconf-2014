@@ -1,5 +1,6 @@
 (function($) {
 	var pusher = new Pusher($("#pusherKey").val());
+	var operations = [];
 
 	$(document).ready(function() {
 		$.get('/murals/1', function(data) {
@@ -21,6 +22,25 @@
 				});
 			});
 		});
+
+		window.setInterval(function() {
+			if(operations.length == 0)
+				return; // nothing to do here
+
+			var sending = operations.splice(0);
+			operations = [];
+
+			$.ajaxq("opqueue", {
+				method: 'post',
+				url: '/murals/1',
+				dataType: "json",
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify({
+					operations: sending,
+					socketId: pusher.connection.socket_id
+				})
+			});
+		}, 5 * 1000);
 	});
 
 	function widgetTemplate(widget) {
@@ -47,7 +67,6 @@
 		Hammer(elem).on("dragend", function(e) {
 			var y = parseInt($elem.css('top').replace(/px$/, ''), 10);
 			var x = parseInt($elem.css('left').replace(/px$/, ''), 10);
-			var operations = [];
 
 			operations.push({
 				action: 'update',
@@ -61,17 +80,6 @@
 				property: 'y',
 				value: y,
 				widget: $elem.data('id')
-			});
-
-			$.ajaxq("opqueue", {
-				method: 'post',
-				url: '/murals/1',
-				dataType: "json",
-				contentType: "application/json; charset=utf-8",
-				data: JSON.stringify({
-					operations: operations,
-					socketId: pusher.connection.socket_id
-				})
 			});
 		});
 
