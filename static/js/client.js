@@ -1,6 +1,6 @@
 (function($) {
 	var pusher = new Pusher($("#pusherKey").val());
-	var operations = [];
+	var operations = {};
 
 	$(document).ready(function() {
 		$.get('/murals/1', function(data) {
@@ -24,11 +24,12 @@
 		});
 
 		window.setInterval(function() {
-			if(operations.length == 0)
+			var keys = Object.keys(operations);
+			if (keys.length == 0)
 				return; // nothing to do here
 
-			var sending = operations.splice(0);
-			operations = [];
+			var sending = keys.map(function(o){ return operations[o]; });
+			operations = {};
 
 			$.ajaxq("opqueue", {
 				method: 'post',
@@ -68,19 +69,20 @@
 			var y = parseInt($elem.css('top').replace(/px$/, ''), 10);
 			var x = parseInt($elem.css('left').replace(/px$/, ''), 10);
 
-			operations.push({
+
+			operations[$elem.data('id') + '-x'] = {
 				action: 'update',
 				property: 'x',
 				value: x,
 				widget: $elem.data('id')
-			});
+			};
 
-			operations.push({
+			operations[$elem.data('id') + '-y'] = {
 				action: 'update',
 				property: 'y',
 				value: y,
 				widget: $elem.data('id')
-			});
+			};
 		});
 
 		return $elem;
